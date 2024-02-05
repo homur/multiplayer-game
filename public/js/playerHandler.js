@@ -3,6 +3,7 @@ const socket = io();
 class PlayerHandler {
   constructor() {
     this.frontendPlayers = {};
+    this.inputSequence = [];
   }
 
   update(backendPlayers) {
@@ -17,6 +18,7 @@ class PlayerHandler {
           color: backendPlayer.color,
           radius: backendPlayer.radius,
           movementSpeed: backendPlayer.movementSpeed,
+          sequenceNumber: backendPlayer.sequenceNumber,
         });
       }
     }
@@ -28,8 +30,8 @@ class PlayerHandler {
       }
     }
 
-    // update players positions
     this.updatePlayerPositions(backendPlayers);
+    this.updateInputSequence()
   }
 
   updatePlayerPositions(backendPlayers) {
@@ -39,8 +41,14 @@ class PlayerHandler {
       if (player && backendPlayers[playerId]) {
         player.x = backendPlayers[playerId].x;
         player.y = backendPlayers[playerId].y;
+        player.sequenceNumber = backendPlayers[playerId].sequenceNumber;
       }
     }
+  }
+
+  updateInputSequence() {
+    //this.inputSequence.push({ test: "test" });
+    console.log(this.inputSequence)
   }
 
   currentPlayer() {
@@ -56,4 +64,5 @@ let players = new PlayerHandler();
 
 socket.on("updatePlayers", (data) => {
   players.update(data);
+  console.log(playerInputs);
 });

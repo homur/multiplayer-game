@@ -17,7 +17,7 @@ const players = {};
 
 const settings = {
   playerRadius: 10,
-  movementSpeed: 20,
+  movementSpeed: 10,
   serverTickRate: 15,
 };
 
@@ -30,6 +30,7 @@ io.on("connection", (socket) => {
     color: `hsl(${Math.random() * 360}, 50%, 50%)`,
     radius: 10,
     movementSpeed: settings.movementSpeed,
+    sequenceNumber: 0,
   };
 
   io.emit("updatePlayers", players);
@@ -42,7 +43,7 @@ io.on("connection", (socket) => {
 
   socket.on("keyDown", (data) => {
     const player = players[socket.id];
-
+    player.sequenceNumber = data.sequenceNumber;
     switch (data.key) {
       case "KeyS":
         player.y += settings.movementSpeed;

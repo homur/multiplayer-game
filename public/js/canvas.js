@@ -1,8 +1,8 @@
 const canvas = document.getElementById("canvas");
 const c = canvas.getContext("2d");
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = 800;
+canvas.height = 600;
 
 const x = canvas.width / 2;
 const y = canvas.height / 2;
