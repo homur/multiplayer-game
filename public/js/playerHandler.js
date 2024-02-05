@@ -30,8 +30,8 @@ class PlayerHandler {
       }
     }
 
+    this.updateInputSequence(backendPlayers[socket.id].inputSequenceNumber);
     this.updatePlayerPositions(backendPlayers);
-    this.updateInputSequence()
   }
 
   updatePlayerPositions(backendPlayers) {
@@ -46,9 +46,25 @@ class PlayerHandler {
     }
   }
 
-  updateInputSequence() {
-    //this.inputSequence.push({ test: "test" });
-    console.log(this.inputSequence)
+  // server reconciliation, lag compensation
+  updateInputSequence(backendSequenceNumber) {
+    const latestBackendSequence = this.inputSequence.findIndex((input) => {
+      return input.inputSequenceNumber === backendSequenceNumber;
+    });
+
+    // lag detected
+    if (latestBackendSequence !== -1) {
+      this.inputSequence.splice(0, latestBackendSequence + 1);
+
+      // move player to the position of the latest input
+      this.inputSequence.forEach((input) => {
+        const currentPlayer = this.currentPlayer();
+        currentPlayer.x += input.dx;
+        currentPlayer.y += input.dy;
+      });
+    }
+
+    console.log(this.inputSequence);
   }
 
   currentPlayer() {
@@ -60,9 +76,8 @@ class PlayerHandler {
   }
 }
 
-let players = new PlayerHandler();
+let playerHandler = new PlayerHandler();
 
 socket.on("updatePlayers", (data) => {
-  players.update(data);
-  console.log(playerInputs);
+  playerHandler.update(data);
 });

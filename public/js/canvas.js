@@ -13,7 +13,7 @@ function animate() {
   c.fillStyle = "rgba(0, 0, 0, 0.1)";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  playerList = players.getPlayers();
+  playerList = playerHandler.getPlayers();
   for (let playerId in playerList) {
     const player = playerList[playerId];
     player.draw();

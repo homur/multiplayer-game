@@ -1,64 +1,90 @@
-const playerInputs = [];
 let inputSequenceNumber = 0;
+
 const keys = {
   w: {
-    pressed: false
+    pressed: false,
   },
   a: {
-    pressed: false
+    pressed: false,
   },
   s: {
-    pressed: false
+    pressed: false,
   },
   d: {
-    pressed: false
-  }
-}
+    pressed: false,
+  },
+};
 
 /**
  * SetInterval
  * sends a sequence number on key press for server reconciliation
- * 
+ *
  */
-setInterval(()=> {
-
-  const currentPlayer = players.currentPlayer();
+setInterval(() => {
+  const currentPlayer = playerHandler.currentPlayer();
 
   if (!currentPlayer) {
     return;
   }
-  
+
   if (keys.w.pressed) {
     inputSequenceNumber++;
-    //currentPlayer.inputSequence.push({ sequenceNumber, dx: 0, dy: -currentPlayer.movementSpeed });
-    socket.emit("keyDown", { key: "KeyW", sequenceNumber: inputSequenceNumber });
+    playerHandler.inputSequence.push({
+      inputSequenceNumber,
+      dx: 0,
+      dy: -currentPlayer.movementSpeed,
+    });
+    socket.emit("keyDown", {
+      key: "KeyW",
+      inputSequenceNumber,
+    });
     currentPlayer.y -= currentPlayer.movementSpeed;
   }
   if (keys.a.pressed) {
     inputSequenceNumber++;
-    //currentPlayer.inputSequence.push({ sequenceNumber, dx: -currentPlayer.movementSpeed, dy: 0 });
-    socket.emit("keyDown", { key: "KeyA", sequenceNumber: inputSequenceNumber });
+    playerHandler.inputSequence.push({
+      inputSequenceNumber,
+      dx: -currentPlayer.movementSpeed,
+      dy: 0,
+    });
+    socket.emit("keyDown", {
+      key: "KeyA",
+      inputSequenceNumber,
+    });
     currentPlayer.x -= currentPlayer.movementSpeed;
   }
   if (keys.s.pressed) {
     inputSequenceNumber++;
-    //currentPlayer.inputSequence.push({ sequenceNumber, dx: 0, dy: currentPlayer.movementSpeed });
-    socket.emit("keyDown", { key: "KeyS", sequenceNumber: inputSequenceNumber });
+    playerHandler.inputSequence.push({
+      inputSequenceNumber,
+      dx: 0,
+      dy: currentPlayer.movementSpeed,
+    });
+    socket.emit("keyDown", {
+      key: "KeyS",
+      inputSequenceNumber,
+    });
     currentPlayer.y += currentPlayer.movementSpeed;
   }
   if (keys.d.pressed) {
     inputSequenceNumber++;
-    //currentPlayer.inputSequence.push({ sequenceNumber, dx: currentPlayer.movementSpeed, dy: 0 });
-    socket.emit("keyDown", { key: "KeyD", sequenceNumber: inputSequenceNumber });
+    playerHandler.inputSequence.push({
+      inputSequenceNumber,
+      dx: currentPlayer.movementSpeed,
+      dy: 0,
+    });
+    socket.emit("keyDown", {
+      key: "KeyD",
+      inputSequenceNumber,
+    });
     currentPlayer.x += currentPlayer.movementSpeed;
   }
-
-}, 15)
+}, 15);
 
 window.addEventListener(
   "keydown",
   function (event) {
-    if (event.defaultPrevented || !players.currentPlayer()) {
+    if (event.defaultPrevented || !playerHandler.currentPlayer()) {
       return; // Do nothing if the event was already processed
     }
 
@@ -85,11 +111,10 @@ window.addEventListener(
   true
 );
 
-
 window.addEventListener(
   "keyup",
   function (event) {
-    if (event.defaultPrevented || !players.currentPlayer()) {
+    if (event.defaultPrevented || !playerHandler.currentPlayer()) {
       return; // Do nothing if the event was already processed
     }
 

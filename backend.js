@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
     color: `hsl(${Math.random() * 360}, 50%, 50%)`,
     radius: 10,
     movementSpeed: settings.movementSpeed,
-    sequenceNumber: 0,
+    inputSequenceNumber: 0,
   };
 
   io.emit("updatePlayers", players);
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
 
   socket.on("keyDown", (data) => {
     const player = players[socket.id];
-    player.sequenceNumber = data.sequenceNumber;
+    player.inputSequenceNumber = data.inputSequenceNumber;
     switch (data.key) {
       case "KeyS":
         player.y += settings.movementSpeed;
