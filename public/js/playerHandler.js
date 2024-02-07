@@ -64,7 +64,7 @@ class PlayerHandler {
       });
     }
 
-    console.log(this.inputSequence);
+    //console.log(this.inputSequence);
   }
 
   currentPlayer() {

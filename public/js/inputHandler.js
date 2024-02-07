@@ -1,4 +1,5 @@
 let inputSequenceNumber = 0;
+const serverTickRate = 15;
 
 const keys = {
   w: {
@@ -79,7 +80,7 @@ setInterval(() => {
     });
     currentPlayer.x += currentPlayer.movementSpeed;
   }
-}, 15);
+}, serverTickRate);
 
 window.addEventListener(
   "keydown",
@@ -115,7 +116,7 @@ window.addEventListener(
   "keyup",
   function (event) {
     if (event.defaultPrevented || !playerHandler.currentPlayer()) {
-      return; // Do nothing if the event was already processed
+      return; 
     }
 
     switch (event.code) {
@@ -132,7 +133,7 @@ window.addEventListener(
         keys.d.pressed = false;
         break;
       default:
-        return; // Quit when this doesn't handle the key event.
+        return; 
     }
 
     // Cancel the default action to avoid it being handled twice
