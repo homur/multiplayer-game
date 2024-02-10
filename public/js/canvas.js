@@ -1,11 +1,18 @@
 const canvas = document.getElementById("canvas");
 const c = canvas.getContext("2d");
 
-canvas.width = 800;
-canvas.height = 600;
+async function startGame() {
+  const result = await gameHandler.onGameStart();
 
-const x = canvas.width / 2;
-const y = canvas.height / 2;
+  if (result) {
+    canvas.width = gameHandler.settings.canvasWidth;
+    canvas.height = gameHandler.settings.canvasHeight;
+
+    animate();
+  }
+}
+
+startGame();
 
 let animationId;
 function animate() {
@@ -13,11 +20,16 @@ function animate() {
   c.fillStyle = "rgba(0, 0, 0, 0.1)";
   c.fillRect(0, 0, canvas.width, canvas.height);
 
-  playerList = playerHandler.getPlayers();
+  // draw players
+  const playerList = playerHandler.getPlayers();
   for (let playerId in playerList) {
     const player = playerList[playerId];
     player.draw();
   }
-}
 
-animate();
+  // draw projectiles
+  const projectiles = projectileHandler.getProjectiles();
+  for (let id in projectiles) {
+    projectiles[id].draw();
+  }
+}

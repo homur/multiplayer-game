@@ -1,11 +1,20 @@
 class Player {
-  constructor({ x, y, color, radius, movementSpeed, sequenceNumber }) {
+  constructor({
+    x,
+    y,
+    color,
+    radius,
+    movementSpeed,
+    sequenceNumber,
+    playerId,
+  }) {
     this.x = x;
     this.y = y;
     this.color = color;
     this.radius = radius;
     this.movementSpeed = movementSpeed;
     this.sequenceNumber = sequenceNumber;
+    this.playerId = playerId;
   }
 
   draw() {

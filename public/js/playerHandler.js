@@ -1,9 +1,8 @@
-const socket = io();
-
 class PlayerHandler {
   constructor() {
     this.frontendPlayers = {};
     this.inputSequence = [];
+    this.projectiles = [];
   }
 
   update(backendPlayers) {
@@ -19,6 +18,7 @@ class PlayerHandler {
           radius: backendPlayer.radius,
           movementSpeed: backendPlayer.movementSpeed,
           sequenceNumber: backendPlayer.sequenceNumber,
+          playerId: playerId,
         });
       }
     }
@@ -31,22 +31,40 @@ class PlayerHandler {
     }
 
     this.updateInputSequence(backendPlayers[socket.id].inputSequenceNumber);
-    this.updatePlayerPositions(backendPlayers);
+    this.updateSelfPosition(
+      backendPlayers[socket.id].x,
+      backendPlayers[socket.id].y,
+      backendPlayers[socket.id].sequenceNumber
+    );
+    this.updateOtherPlayersPositions(backendPlayers);
   }
 
-  updatePlayerPositions(backendPlayers) {
-    for (let playerId in this.frontendPlayers) {
-      const player = this.frontendPlayers[playerId];
+  updateSelfPosition(x, y, sequenceNumber) {
+    const currentPlayer = this.currentPlayer();
+    currentPlayer.x = x;
+    currentPlayer.y = y;
+    currentPlayer.sequenceNumber = sequenceNumber;
+  }
 
-      if (player && backendPlayers[playerId]) {
-        player.x = backendPlayers[playerId].x;
-        player.y = backendPlayers[playerId].y;
-        player.sequenceNumber = backendPlayers[playerId].sequenceNumber;
+  // WIP
+  updateOtherPlayersPositions(backendPlayers) {
+    for (let playerId in backendPlayers) {
+      if (playerId !== socket.id) {
+        const frontendPlayer = this.frontendPlayers[playerId];
+
+        if (frontendPlayer) {
+          gsap.to(frontendPlayer, {
+            duration: 0.1,
+            x: backendPlayers[playerId].x,
+            y: backendPlayers[playerId].y,
+            ease: "linear",
+          });
+        }
       }
     }
   }
 
-  // server reconciliation, lag compensation
+  // lag compensation
   updateInputSequence(backendSequenceNumber) {
     const latestBackendSequence = this.inputSequence.findIndex((input) => {
       return input.inputSequenceNumber === backendSequenceNumber;
@@ -59,8 +77,8 @@ class PlayerHandler {
       // move player to the position of the latest input
       this.inputSequence.forEach((input) => {
         const currentPlayer = this.currentPlayer();
-        currentPlayer.x += input.dx;
-        currentPlayer.y += input.dy;
+        currentPlayer.x += input.x;
+        currentPlayer.y += input.y;
       });
     }
 
@@ -74,10 +92,19 @@ class PlayerHandler {
   getPlayers() {
     return this.frontendPlayers;
   }
+
+  getProjectiles() {
+    return this.projectiles;
+  }
+
+  deleteProjectile(projectile) {
+    const index = this.projectiles.indexOf(projectile);
+    this.projectiles.splice(index, 1);
+  }
 }
 
 let playerHandler = new PlayerHandler();
 
-socket.on("updatePlayers", (data) => {
-  playerHandler.update(data);
+socket.on("updatePlayers", (players) => {
+  playerHandler.update(players);
 });

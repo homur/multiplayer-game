@@ -1,5 +1,5 @@
 let inputSequenceNumber = 0;
-const serverTickRate = 15;
+const serverTickRate = gameHandler.settings.serverTickRate;
 
 const keys = {
   w: {
@@ -21,6 +21,7 @@ const keys = {
  * sends a sequence number on key press for server reconciliation
  *
  */
+
 setInterval(() => {
   const currentPlayer = playerHandler.currentPlayer();
 
@@ -116,7 +117,7 @@ window.addEventListener(
   "keyup",
   function (event) {
     if (event.defaultPrevented || !playerHandler.currentPlayer()) {
-      return; 
+      return;
     }
 
     switch (event.code) {
@@ -133,7 +134,7 @@ window.addEventListener(
         keys.d.pressed = false;
         break;
       default:
-        return; 
+        return;
     }
 
     // Cancel the default action to avoid it being handled twice
@@ -141,3 +142,22 @@ window.addEventListener(
   },
   true
 );
+
+window.addEventListener("click", (event) => {
+  const angle = Math.atan2(
+    event.clientY - canvas.height / 2,
+    event.clientX - canvas.width / 2
+  );
+
+  const currentPlayer = playerHandler.currentPlayer();
+  socket.emit("shoot", {
+    angle: angle,
+    x: currentPlayer.x,
+    y: currentPlayer.y,
+  });
+
+  const projectilesList = projectileHandler.getProjectiles();
+  console.log(projectilesList);
+
+  //console.log(angle, currentPlayer.x, currentPlayer.y);
+});

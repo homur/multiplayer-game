@@ -16,13 +16,29 @@ app.get("/", (req, res) => {
 const players = {};
 
 const settings = {
+  canvasWidth: 800,
+  canvasHeight: 600,
   playerRadius: 10,
-  movementSpeed: 10,
+  movementSpeed: 5,
   serverTickRate: 15,
+  maxPlayers: 2,
+  projectileSpeed: 20,
+  projectileRadius: 3,
 };
+
+const projectiles = {};
+let projectileId = 0;
 
 io.on("connection", (socket) => {
   console.log("a user connected");
+
+  // reject connection if max players reached
+  if (Object.keys(players).length >= settings.maxPlayers) {
+    socket.disconnect();
+    return;
+  }
+
+  io.emit("gameStart", settings);
 
   players[socket.id] = {
     x: 300 * Math.random(),
@@ -61,10 +77,48 @@ io.on("connection", (socket) => {
         return;
     }
   });
+
+  socket.on("shoot", ({ angle, x, y }) => {
+    projectileId++;
+
+    const velocity = {
+      x: Math.cos(angle) * settings.projectileSpeed,
+      y: Math.sin(angle) * settings.projectileSpeed,
+    };
+
+    projectiles[projectileId] = {
+      x,
+      y,
+      angle,
+      velocity,
+      playerId: socket.id,
+      color: players[socket.id].color,
+      radius: settings.projectileRadius,
+    };
+
+    console.log("shoot", projectiles);
+  });
 });
 
 // serverTick
 setInterval(() => {
+  // update projectile positions
+  for (let projectileId in projectiles) {
+    const projectile = projectiles[projectileId];
+    projectile.x += projectile.velocity.x;
+    projectile.y += projectile.velocity.y;
+
+    if (
+      projectile.x < 0 ||
+      projectile.x > settings.canvasWidth ||
+      projectile.y < 0 ||
+      projectile.y > settings.canvasHeight
+    ) {
+      delete projectiles[projectileId];
+    }
+  }
+
+  io.emit("updateProjectiles", projectiles);
   io.emit("updatePlayers", players);
 }, settings.serverTickRate);
 
