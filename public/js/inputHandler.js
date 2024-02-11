@@ -144,12 +144,14 @@ window.addEventListener(
 );
 
 window.addEventListener("click", (event) => {
+  const currentPlayer = playerHandler.currentPlayer();
+
+  // relative to canvas
   const angle = Math.atan2(
-    event.clientY - canvas.height / 2,
-    event.clientX - canvas.width / 2
+    event.clientY - (currentPlayer.y + canvas.getBoundingClientRect().top),
+    event.clientX - (currentPlayer.x + canvas.getBoundingClientRect().left)
   );
 
-  const currentPlayer = playerHandler.currentPlayer();
   socket.emit("shoot", {
     angle: angle,
     x: currentPlayer.x,
@@ -157,6 +159,7 @@ window.addEventListener("click", (event) => {
   });
 
   const projectilesList = projectileHandler.getProjectiles();
+
   console.log(projectilesList);
 
   //console.log(angle, currentPlayer.x, currentPlayer.y);

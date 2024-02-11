@@ -23,7 +23,7 @@ const settings = {
   serverTickRate: 15,
   maxPlayers: 2,
   projectileSpeed: 20,
-  projectileRadius: 3,
+  projectileRadius: 2,
 };
 
 const projectiles = {};
@@ -60,18 +60,35 @@ io.on("connection", (socket) => {
   socket.on("keyDown", (data) => {
     const player = players[socket.id];
     player.inputSequenceNumber = data.inputSequenceNumber;
+
     switch (data.key) {
       case "KeyS":
-        player.y += settings.movementSpeed;
+        if (player.y - player.radius >= settings.canvasHeight) {
+          player.y = settings.canvasHeight - player.radius;
+        } else {
+          player.y += settings.movementSpeed;
+        }
         break;
       case "KeyW":
-        player.y -= settings.movementSpeed;
+        if (player.y - player.radius <= 0) {
+          player.y = 0;
+        } else {
+          player.y -= settings.movementSpeed;
+        }
         break;
       case "KeyA":
-        player.x -= settings.movementSpeed;
+        if (player.x - player.radius <= 0) {
+          player.x = 0;
+        } else {
+          player.x -= settings.movementSpeed;
+        }
         break;
       case "KeyD":
-        player.x += settings.movementSpeed;
+        if (player.x + player.radius >= settings.canvasWidth) {
+          player.x = settings.canvasWidth - player.radius;
+        } else {
+          player.x += settings.movementSpeed;
+        }
         break;
       default:
         return;
