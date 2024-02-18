@@ -31,15 +31,15 @@ const projectiles = {};
 let projectileId = 0;
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
-
   // reject connection if max players reached
   if (Object.keys(players).length >= settings.maxPlayers) {
     socket.disconnect();
     return;
   }
 
-  io.emit("gameStart", settings);
+  const { token, playerName } = socket.handshake.query;
+
+  console.log("a user connected", "token:", token, "playerName:", playerName);
 
   players[socket.id] = {
     x: 300 * Math.random(),
@@ -48,14 +48,15 @@ io.on("connection", (socket) => {
     radius: settings.playerRadius,
     movementSpeed: settings.movementSpeed,
     inputSequenceNumber: 0,
+    playerName: playerName || "",
   };
 
-  io.emit("updatePlayers", players);
+  io.emit("gameStart", { settings, players });
 
   socket.on("disconnect", (reason) => {
     delete players[socket.id];
     io.emit("updatePlayers", players);
-    console.log("a user disconnected");
+    console.log("a user disconnected", reason);
   });
 
   socket.on("keyDown", (data) => {
@@ -151,7 +152,6 @@ setInterval(() => {
 
           delete projectiles[projectileId];
 
-          console.log("player hit", players);
           io.emit("playerHit", players);
         }
       }
@@ -159,7 +159,7 @@ setInterval(() => {
   }
 
   io.emit("updateProjectiles", projectiles);
-  io.emit("updatePlayers", players);
+  io.emit("updatePlayerPositions", players);
 }, settings.serverTickRate);
 
 server.listen(port, () => {

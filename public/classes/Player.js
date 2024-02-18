@@ -7,6 +7,7 @@ class Player {
     movementSpeed,
     sequenceNumber,
     playerId,
+    playerName,
   }) {
     this.x = x;
     this.y = y;
@@ -15,11 +16,13 @@ class Player {
     this.movementSpeed = movementSpeed;
     this.sequenceNumber = sequenceNumber;
     this.playerId = playerId;
+    this.playerName = playerName;
   }
 
   draw() {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    c.fillText("this.playerName", this.x, this.y - this.radius);
     c.fillStyle = this.color;
     c.fill();
   }

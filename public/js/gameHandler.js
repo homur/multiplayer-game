@@ -13,15 +13,16 @@ class GameHandler {
   }
 
   startGame(settings) {
+    document.getElementById("gameStartUi").style.display = "none";
     this.settings = settings;
     this.state = GameState.running;
   }
 
-  initSocket() {
-    socket = io("ws://localhost:3000");
-
-    socket.on("gameStart", (settings) => {
+  initSocket(playerName) {
+    socket = io("ws://localhost:3000", { query: { token: "asd", playerName } });
+    socket.on("gameStart", ({ settings, players }) => {
       gameHandler.startGame(settings);
+      playerHandler.updatePlayerCount(players);
     });
   }
 
@@ -41,4 +42,4 @@ class GameHandler {
   }
 }
 
-let gameHandler = new GameHandler({});
+let gameHandler = new GameHandler();

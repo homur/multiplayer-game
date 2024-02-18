@@ -162,5 +162,12 @@ gameHandler.isGameRunning().then(() => {
 });
 
 document.getElementById("startGame").addEventListener("click", () => {
-  gameHandler.initSocket();
+  const playerName = document.getElementById("playerName").value;
+
+  if (playerName === "") {
+    alert("Please enter a playerName");
+    return;
+  } else {
+    gameHandler.initSocket(playerName.toString());
+  }
 });

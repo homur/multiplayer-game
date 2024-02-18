@@ -5,10 +5,12 @@ class PlayerHandler {
     this.projectiles = [];
   }
 
-  update(backendPlayers) {
+  updatePlayerCount(backendPlayers) {
     this.addMissingPlayers(backendPlayers);
     this.deleteGonePlayers(backendPlayers);
+  }
 
+  updatePlayerPositions(backendPlayers) {
     this.updateInputSequence(backendPlayers[socket.id].inputSequenceNumber);
     this.updateSelfPosition(backendPlayers[socket.id]);
     this.updateOtherPlayersPositions(backendPlayers);
@@ -28,6 +30,7 @@ class PlayerHandler {
           movementSpeed: backendPlayer.movementSpeed,
           sequenceNumber: backendPlayer.sequenceNumber,
           playerId: playerId,
+          playerName: backendPlayer.playerName,
         });
       }
     }
@@ -117,7 +120,11 @@ let playerHandler = new PlayerHandler();
 
 gameHandler.isGameRunning().then(() => {
   socket.on("updatePlayers", (players) => {
-    playerHandler.update(players);
+    playerHandler.updatePlayerCount(players);
+  });
+
+  socket.on("updatePlayerPositions", (players) => {
+    playerHandler.updatePlayerPositions(players);
   });
 
   socket.on("playerHit", (backendPlayers) => {
