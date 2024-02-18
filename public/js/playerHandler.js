@@ -6,7 +6,16 @@ class PlayerHandler {
   }
 
   update(backendPlayers) {
-    // add players that are not in the frontend
+    this.addMissingPlayers(backendPlayers);
+    this.deleteGonePlayers(backendPlayers);
+
+    this.updateInputSequence(backendPlayers[socket.id].inputSequenceNumber);
+    this.updateSelfPosition(backendPlayers[socket.id]);
+    this.updateOtherPlayersPositions(backendPlayers);
+  }
+
+  // add players that are not in the frontend
+  addMissingPlayers(backendPlayers) {
     for (let playerId in backendPlayers) {
       const backendPlayer = backendPlayers[playerId];
 
@@ -22,31 +31,24 @@ class PlayerHandler {
         });
       }
     }
+  }
 
-    // delete players that are not in the backend
+  // delete players that are not in the backend
+  deleteGonePlayers(backendPlayers) {
     for (let playerId in this.frontendPlayers) {
       if (!backendPlayers[playerId]) {
         delete this.frontendPlayers[playerId];
       }
     }
-
-    this.updateInputSequence(backendPlayers[socket.id].inputSequenceNumber);
-    this.updateSelfPosition(
-      backendPlayers[socket.id].x,
-      backendPlayers[socket.id].y,
-      backendPlayers[socket.id].sequenceNumber
-    );
-    this.updateOtherPlayersPositions(backendPlayers);
   }
 
-  updateSelfPosition(x, y, sequenceNumber) {
+  updateSelfPosition(backendPlayer) {
     const currentPlayer = this.currentPlayer();
-    currentPlayer.x = x;
-    currentPlayer.y = y;
-    currentPlayer.sequenceNumber = sequenceNumber;
+    currentPlayer.x = backendPlayer.x;
+    currentPlayer.y = backendPlayer.y;
+    currentPlayer.sequenceNumber = backendPlayer.sequenceNumber;
   }
 
-  // WIP
   updateOtherPlayersPositions(backendPlayers) {
     for (let playerId in backendPlayers) {
       if (playerId !== socket.id) {
@@ -85,6 +87,15 @@ class PlayerHandler {
     //console.log(this.inputSequence);
   }
 
+  updateOnDamage(backendPlayers) {
+    for (let playerId in backendPlayers) {
+      console.log(playerId);
+      if (this.frontendPlayers[playerId]) {
+        this.frontendPlayers[playerId].radius = backendPlayers[playerId].radius;
+      }
+    }
+  }
+
   currentPlayer() {
     return this.frontendPlayers[socket.id];
   }
@@ -107,4 +118,8 @@ let playerHandler = new PlayerHandler();
 
 socket.on("updatePlayers", (players) => {
   playerHandler.update(players);
+});
+
+socket.on("playerHit", (backendPlayers) => {
+  playerHandler.updateOnDamage(backendPlayers);
 });

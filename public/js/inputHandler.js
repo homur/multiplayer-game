@@ -157,10 +157,4 @@ window.addEventListener("click", (event) => {
     x: currentPlayer.x,
     y: currentPlayer.y,
   });
-
-  const projectilesList = projectileHandler.getProjectiles();
-
-  console.log(projectilesList);
-
-  //console.log(angle, currentPlayer.x, currentPlayer.y);
 });

@@ -1,6 +1,6 @@
-const socket = io();
+const socket = io("ws://localhost:3000");
 
-const gameStates = Object.freeze({
+const GameState = Object.freeze({
   waiting: 0,
   running: 1,
   ended: 2,
@@ -9,15 +9,13 @@ const gameStates = Object.freeze({
 class GameHandler {
   constructor(settings) {
     this.settings = settings;
-    this.state = gameStates.waiting;
+    this.state = GameState.waiting;
   }
 
   onGameStart() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
-        console.log(this.state);
-
-        if (this.state === gameStates.running) {
+        if (this.state === GameState.running) {
           clearInterval(interval);
           resolve(true);
         }
@@ -30,5 +28,5 @@ let gameHandler = new GameHandler({});
 
 socket.on("gameStart", (settings) => {
   gameHandler.settings = settings;
-  gameHandler.state = gameStates.running;
+  gameHandler.state = GameState.running;
 });

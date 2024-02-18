@@ -18,12 +18,13 @@ const players = {};
 const settings = {
   canvasWidth: 800,
   canvasHeight: 600,
-  playerRadius: 10,
+  playerRadius: 20,
   movementSpeed: 5,
   serverTickRate: 15,
   maxPlayers: 2,
   projectileSpeed: 20,
   projectileRadius: 2,
+  projectileDamage: 1,
 };
 
 const projectiles = {};
@@ -44,7 +45,7 @@ io.on("connection", (socket) => {
     x: 300 * Math.random(),
     y: 300 * Math.random(),
     color: `hsl(${Math.random() * 360}, 50%, 50%)`,
-    radius: 10,
+    radius: settings.playerRadius,
     movementSpeed: settings.movementSpeed,
     inputSequenceNumber: 0,
   };
@@ -108,12 +109,12 @@ io.on("connection", (socket) => {
       y,
       angle,
       velocity,
-      playerId: socket.id,
+      ownerId: socket.id,
       color: players[socket.id].color,
       radius: settings.projectileRadius,
     };
 
-    console.log("shoot", projectiles);
+    //console.log("shoot", projectiles);
   });
 });
 
@@ -126,12 +127,34 @@ setInterval(() => {
     projectile.y += projectile.velocity.y;
 
     if (
-      projectile.x < 0 ||
-      projectile.x > settings.canvasWidth ||
-      projectile.y < 0 ||
-      projectile.y > settings.canvasHeight
+      projectile.x - settings.projectileRadius < 0 ||
+      projectile.x + settings.projectileRadius > settings.canvasWidth ||
+      projectile.y - settings.projectileRadius < 0 ||
+      projectile.y + settings.projectileRadius > settings.canvasHeight
     ) {
       delete projectiles[projectileId];
+    }
+    // detect collision with players
+    else {
+      for (let playerId in players) {
+        const player = players[playerId];
+        const dx = player.x - projectile.x;
+        const dy = player.y - projectile.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (
+          distance < player.radius + settings.projectileRadius &&
+          projectile.ownerId !== playerId
+        ) {
+          players[playerId].radius -= settings.projectileDamage;
+          players[projectile.ownerId].radius += settings.projectileDamage;
+
+          delete projectiles[projectileId];
+
+          console.log("player hit", players);
+          io.emit("playerHit", players);
+        }
+      }
     }
   }
 

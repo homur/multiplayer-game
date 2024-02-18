@@ -17,7 +17,9 @@ startGame();
 let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate);
-  c.fillStyle = "rgba(0, 0, 0, 0.1)";
+
+  c.fillStyle = "rgba(0, 0, 0, 1)";
+  c.clearRect(0, 0, canvas.width, canvas.height);
   c.fillRect(0, 0, canvas.width, canvas.height);
 
   // draw players
