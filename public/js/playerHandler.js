@@ -89,7 +89,6 @@ class PlayerHandler {
 
   updateOnDamage(backendPlayers) {
     for (let playerId in backendPlayers) {
-      console.log(playerId);
       if (this.frontendPlayers[playerId]) {
         this.frontendPlayers[playerId].radius = backendPlayers[playerId].radius;
       }
@@ -116,10 +115,12 @@ class PlayerHandler {
 
 let playerHandler = new PlayerHandler();
 
-socket.on("updatePlayers", (players) => {
-  playerHandler.update(players);
-});
+gameHandler.isGameRunning().then(() => {
+  socket.on("updatePlayers", (players) => {
+    playerHandler.update(players);
+  });
 
-socket.on("playerHit", (backendPlayers) => {
-  playerHandler.updateOnDamage(backendPlayers);
+  socket.on("playerHit", (backendPlayers) => {
+    playerHandler.updateOnDamage(backendPlayers);
+  });
 });

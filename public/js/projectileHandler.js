@@ -52,6 +52,8 @@ class ProjectileHandler {
 
 const projectileHandler = new ProjectileHandler();
 
-socket.on("updateProjectiles", (backendProjectiles) => {
-  projectileHandler.updateProjectiles(backendProjectiles);
+gameHandler.isGameRunning().then(() => {
+  socket.on("updateProjectiles", (backendProjectiles) => {
+    projectileHandler.updateProjectiles(backendProjectiles);
+  });
 });

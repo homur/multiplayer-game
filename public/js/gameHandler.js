@@ -1,32 +1,44 @@
-const socket = io("ws://localhost:3000");
-
 const GameState = Object.freeze({
   waiting: 0,
   running: 1,
   ended: 2,
 });
 
+let socket;
+
 class GameHandler {
-  constructor(settings) {
-    this.settings = settings;
+  constructor() {
+    this.settings = {};
     this.state = GameState.waiting;
   }
 
-  onGameStart() {
+  startGame(settings) {
+    this.settings = settings;
+    this.state = GameState.running;
+  }
+
+  initSocket() {
+    socket = io("ws://localhost:3000");
+
+    socket.on("gameStart", (settings) => {
+      gameHandler.startGame(settings);
+    });
+  }
+
+  checkRunning() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         if (this.state === GameState.running) {
-          clearInterval(interval);
           resolve(true);
+          clearInterval(interval);
         }
       }, 100);
     });
   }
+
+  async isGameRunning() {
+    return await this.checkRunning();
+  }
 }
 
 let gameHandler = new GameHandler({});
-
-socket.on("gameStart", (settings) => {
-  gameHandler.settings = settings;
-  gameHandler.state = GameState.running;
-});

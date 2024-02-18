@@ -1,20 +1,13 @@
 const canvas = document.getElementById("canvas");
 const c = canvas.getContext("2d");
-
-async function startGame() {
-  const result = await gameHandler.onGameStart();
-
-  if (result) {
-    canvas.width = gameHandler.settings.canvasWidth;
-    canvas.height = gameHandler.settings.canvasHeight;
-
-    animate();
-  }
-}
-
-startGame();
-
 let animationId;
+
+gameHandler.isGameRunning().then(() => {
+  canvas.width = gameHandler.settings.canvasWidth;
+  canvas.height = gameHandler.settings.canvasHeight;
+  animate();
+});
+
 function animate() {
   animationId = requestAnimationFrame(animate);
 

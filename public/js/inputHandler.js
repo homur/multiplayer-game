@@ -22,139 +22,145 @@ const keys = {
  *
  */
 
-setInterval(() => {
-  const currentPlayer = playerHandler.currentPlayer();
+gameHandler.isGameRunning().then(() => {
+  setInterval(() => {
+    const currentPlayer = playerHandler.currentPlayer();
 
-  if (!currentPlayer) {
-    return;
-  }
-
-  if (keys.w.pressed) {
-    inputSequenceNumber++;
-    playerHandler.inputSequence.push({
-      inputSequenceNumber,
-      dx: 0,
-      dy: -currentPlayer.movementSpeed,
-    });
-    socket.emit("keyDown", {
-      key: "KeyW",
-      inputSequenceNumber,
-    });
-    currentPlayer.y -= currentPlayer.movementSpeed;
-  }
-  if (keys.a.pressed) {
-    inputSequenceNumber++;
-    playerHandler.inputSequence.push({
-      inputSequenceNumber,
-      dx: -currentPlayer.movementSpeed,
-      dy: 0,
-    });
-    socket.emit("keyDown", {
-      key: "KeyA",
-      inputSequenceNumber,
-    });
-    currentPlayer.x -= currentPlayer.movementSpeed;
-  }
-  if (keys.s.pressed) {
-    inputSequenceNumber++;
-    playerHandler.inputSequence.push({
-      inputSequenceNumber,
-      dx: 0,
-      dy: currentPlayer.movementSpeed,
-    });
-    socket.emit("keyDown", {
-      key: "KeyS",
-      inputSequenceNumber,
-    });
-    currentPlayer.y += currentPlayer.movementSpeed;
-  }
-  if (keys.d.pressed) {
-    inputSequenceNumber++;
-    playerHandler.inputSequence.push({
-      inputSequenceNumber,
-      dx: currentPlayer.movementSpeed,
-      dy: 0,
-    });
-    socket.emit("keyDown", {
-      key: "KeyD",
-      inputSequenceNumber,
-    });
-    currentPlayer.x += currentPlayer.movementSpeed;
-  }
-}, serverTickRate);
-
-window.addEventListener(
-  "keydown",
-  function (event) {
-    if (event.defaultPrevented || !playerHandler.currentPlayer()) {
-      return; // Do nothing if the event was already processed
-    }
-
-    switch (event.code) {
-      case "KeyW":
-        keys.w.pressed = true;
-        break;
-      case "KeyA":
-        keys.a.pressed = true;
-        break;
-      case "KeyS":
-        keys.s.pressed = true;
-        break;
-      case "KeyD":
-        keys.d.pressed = true;
-        break;
-      default:
-        return; // Quit when this doesn't handle the key event.
-    }
-
-    // Cancel the default action to avoid it being handled twice
-    event.preventDefault();
-  },
-  true
-);
-
-window.addEventListener(
-  "keyup",
-  function (event) {
-    if (event.defaultPrevented || !playerHandler.currentPlayer()) {
+    if (!currentPlayer) {
       return;
     }
 
-    switch (event.code) {
-      case "KeyW":
-        keys.w.pressed = false;
-        break;
-      case "KeyA":
-        keys.a.pressed = false;
-        break;
-      case "KeyS":
-        keys.s.pressed = false;
-        break;
-      case "KeyD":
-        keys.d.pressed = false;
-        break;
-      default:
-        return;
+    if (keys.w.pressed) {
+      inputSequenceNumber++;
+      playerHandler.inputSequence.push({
+        inputSequenceNumber,
+        dx: 0,
+        dy: -currentPlayer.movementSpeed,
+      });
+      socket.emit("keyDown", {
+        key: "KeyW",
+        inputSequenceNumber,
+      });
+      currentPlayer.y -= currentPlayer.movementSpeed;
     }
+    if (keys.a.pressed) {
+      inputSequenceNumber++;
+      playerHandler.inputSequence.push({
+        inputSequenceNumber,
+        dx: -currentPlayer.movementSpeed,
+        dy: 0,
+      });
+      socket.emit("keyDown", {
+        key: "KeyA",
+        inputSequenceNumber,
+      });
+      currentPlayer.x -= currentPlayer.movementSpeed;
+    }
+    if (keys.s.pressed) {
+      inputSequenceNumber++;
+      playerHandler.inputSequence.push({
+        inputSequenceNumber,
+        dx: 0,
+        dy: currentPlayer.movementSpeed,
+      });
+      socket.emit("keyDown", {
+        key: "KeyS",
+        inputSequenceNumber,
+      });
+      currentPlayer.y += currentPlayer.movementSpeed;
+    }
+    if (keys.d.pressed) {
+      inputSequenceNumber++;
+      playerHandler.inputSequence.push({
+        inputSequenceNumber,
+        dx: currentPlayer.movementSpeed,
+        dy: 0,
+      });
+      socket.emit("keyDown", {
+        key: "KeyD",
+        inputSequenceNumber,
+      });
+      currentPlayer.x += currentPlayer.movementSpeed;
+    }
+  }, serverTickRate);
 
-    // Cancel the default action to avoid it being handled twice
-    event.preventDefault();
-  },
-  true
-);
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.defaultPrevented || !playerHandler.currentPlayer()) {
+        return; // Do nothing if the event was already processed
+      }
 
-window.addEventListener("click", (event) => {
-  const currentPlayer = playerHandler.currentPlayer();
+      switch (event.code) {
+        case "KeyW":
+          keys.w.pressed = true;
+          break;
+        case "KeyA":
+          keys.a.pressed = true;
+          break;
+        case "KeyS":
+          keys.s.pressed = true;
+          break;
+        case "KeyD":
+          keys.d.pressed = true;
+          break;
+        default:
+          return; // Quit when this doesn't handle the key event.
+      }
 
-  // relative to canvas
-  const angle = Math.atan2(
-    event.clientY - (currentPlayer.y + canvas.getBoundingClientRect().top),
-    event.clientX - (currentPlayer.x + canvas.getBoundingClientRect().left)
+      // Cancel the default action to avoid it being handled twice
+      event.preventDefault();
+    },
+    true
   );
 
-  socket.emit("shoot", {
-    angle: angle,
-    x: currentPlayer.x,
-    y: currentPlayer.y,
+  window.addEventListener(
+    "keyup",
+    function (event) {
+      if (event.defaultPrevented || !playerHandler.currentPlayer()) {
+        return;
+      }
+
+      switch (event.code) {
+        case "KeyW":
+          keys.w.pressed = false;
+          break;
+        case "KeyA":
+          keys.a.pressed = false;
+          break;
+        case "KeyS":
+          keys.s.pressed = false;
+          break;
+        case "KeyD":
+          keys.d.pressed = false;
+          break;
+        default:
+          return;
+      }
+
+      // Cancel the default action to avoid it being handled twice
+      event.preventDefault();
+    },
+    true
+  );
+
+  window.addEventListener("click", (event) => {
+    const currentPlayer = playerHandler.currentPlayer();
+
+    // relative to canvas
+    const angle = Math.atan2(
+      event.clientY - (currentPlayer.y + canvas.getBoundingClientRect().top),
+      event.clientX - (currentPlayer.x + canvas.getBoundingClientRect().left)
+    );
+
+    socket.emit("shoot", {
+      angle: angle,
+      x: currentPlayer.x,
+      y: currentPlayer.y,
+    });
   });
+});
+
+document.getElementById("startGame").addEventListener("click", () => {
+  gameHandler.initSocket();
 });
