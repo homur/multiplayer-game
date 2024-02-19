@@ -11,8 +11,42 @@
       <canvas id="canvas"></canvas>
 
       <div id="gameStartUi">
-        <input type="text" id="playerName" />
+        <input type="text" id="playerName" autocomplete="on" />
         <button id="startGame">Start</button>
+      </div>
+
+      <div id="gameOverUi">
+        <div>DED</div>
+        <button id="restartGame">Restart</button>
+      </div>
+
+      <div class="debugPanel">
+        <div class="playerInfo">
+          <div class="row">
+            <div id="pId"></div>
+          </div>
+          <div class="row">
+            name:
+            <div id="pName"></div>
+          </div>
+          <div class="row">
+            x:
+            <div id="pX"></div>
+          </div>
+          <div class="row">
+            y:
+            <div id="pY"></div>
+          </div>
+          <div class="row">
+            radius:
+            <div id="pRadius"></div>
+          </div>
+          <div class="row">
+            move speed:
+            <div id="pMoveSpeed"></div>
+          </div>
+        </div>
+        <div class="projectileInfo"></div>
       </div>
     </div>
 

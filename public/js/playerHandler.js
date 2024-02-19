@@ -40,9 +40,13 @@ class PlayerHandler {
   deleteGonePlayers(backendPlayers) {
     for (let playerId in this.frontendPlayers) {
       if (!backendPlayers[playerId]) {
-        delete this.frontendPlayers[playerId];
+        this.removePlayer(playerId);
       }
     }
+  }
+
+  removePlayer(playerId) {
+    delete this.frontendPlayers[playerId];
   }
 
   updateSelfPosition(backendPlayer) {
@@ -94,6 +98,8 @@ class PlayerHandler {
     for (let playerId in backendPlayers) {
       if (this.frontendPlayers[playerId]) {
         this.frontendPlayers[playerId].radius = backendPlayers[playerId].radius;
+        this.frontendPlayers[playerId].movementSpeed =
+          backendPlayers[playerId].movementSpeed;
       }
     }
   }
@@ -114,6 +120,17 @@ class PlayerHandler {
     const index = this.projectiles.indexOf(projectile);
     this.projectiles.splice(index, 1);
   }
+
+  updateDebugUi() {
+    const player = this.currentPlayer();
+
+    document.getElementById("pId").innerText = player.playerId;
+    document.getElementById("pName").innerText = player.playerName;
+    document.getElementById("pX").innerText = player.x;
+    document.getElementById("pY").innerText = player.y;
+    document.getElementById("pRadius").innerText = player.playerName;
+    document.getElementById("pMoveSpeed").innerText = player.movementSpeed;
+  }
 }
 
 let playerHandler = new PlayerHandler();
@@ -125,9 +142,17 @@ gameHandler.isGameRunning().then(() => {
 
   socket.on("updatePlayerPositions", (players) => {
     playerHandler.updatePlayerPositions(players);
+    playerHandler.updateDebugUi();
   });
 
   socket.on("playerHit", (backendPlayers) => {
     playerHandler.updateOnDamage(backendPlayers);
+  });
+
+  socket.on("playerEliminated", (playerId) => {
+    if (playerId === playerHandler.currentPlayer().playerId) {
+      document.getElementById("gameOverUi").style.display = "flex";
+      socket.disconnect();
+    }
   });
 });

@@ -159,7 +159,7 @@ gameHandler.isGameRunning().then(() => {
       y: currentPlayer.y,
     });
 
-    console.log(playerHandler.getPlayers());
+    //console.log(playerHandler.getPlayers());
   });
 });
 
@@ -172,4 +172,8 @@ document.getElementById("startGame").addEventListener("click", () => {
   } else {
     gameHandler.initSocket(playerName.toString());
   }
+});
+
+document.getElementById("restartGame").addEventListener("click", () => {
+  location.reload();
 });

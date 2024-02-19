@@ -15,36 +15,33 @@ app.get("/", (req, res) => {
 
 const players = {};
 
-
-
 const gameSettings = {
   canvasWidth: 800,
   canvasHeight: 600,
   serverTickRate: 15,
   maxPlayers: 2,
-}
+};
 
 const playerSettings = {
   radius: {
     default: 20,
-    minimum: 2,
+    minimum: 5,
     maximum: 40,
   },
   speed: {
     default: 5,
-    minimum: 1,
+    minimum: 0.1,
     maximum: 10,
-  }
-}
+  },
+};
 
 const projectileSettings = {
   speed: 20,
   radius: 2,
   damage: 1,
-}
+};
 
 const projectiles = {};
-let projectileId = 0;
 
 io.on("connection", (socket) => {
   // reject connection if max players reached
@@ -84,28 +81,28 @@ io.on("connection", (socket) => {
         if (player.y - player.radius >= gameSettings.canvasHeight) {
           player.y = gameSettings.canvasHeight - player.radius;
         } else {
-          player.y += playerSettings.speed.default;
+          player.y += player.movementSpeed;
         }
         break;
       case "KeyW":
         if (player.y - player.radius <= 0) {
           player.y = 0;
         } else {
-          player.y -= playerSettings.speed.default;
+          player.y -= player.movementSpeed;
         }
         break;
       case "KeyA":
         if (player.x - player.radius <= 0) {
           player.x = 0;
         } else {
-          player.x -= playerSettings.speed.default;
+          player.x -= player.movementSpeed;
         }
         break;
       case "KeyD":
-        if (player.x + player.radius >= settings.canvasWidth) {
-          player.x = settings.canvasWidth - player.radius;
+        if (player.x + player.radius >= gameSettings.canvasWidth) {
+          player.x = gameSettings.canvasWidth - player.radius;
         } else {
-          player.x += playerSettings.speed.default;
+          player.x += player.movementSpeed;
         }
         break;
       default:
@@ -113,6 +110,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  let projectileId = 0;
   socket.on("shoot", ({ angle, x, y }) => {
     projectileId++;
 
@@ -143,6 +141,7 @@ setInterval(() => {
     projectile.x += projectile.velocity.x;
     projectile.y += projectile.velocity.y;
 
+    // delete out of bounds projectiles
     if (
       projectile.x - projectileSettings.radius < 0 ||
       projectile.x + projectileSettings.radius > gameSettings.canvasWidth ||
@@ -163,12 +162,20 @@ setInterval(() => {
           distance < player.radius + projectileSettings.radius &&
           projectile.ownerId !== playerId
         ) {
-          players[playerId].radius -= projectileSettings.damage;
-          players[projectile.ownerId].radius += projectileSettings.damage;
+          // player hit
+          if (player.radius <= playerSettings.radius.minimum) {
+            //player eliminated
+            io.emit("playerEliminated", playerId);
+          } else {
+            delete projectiles[projectileId];
 
-          delete projectiles[projectileId];
+            players[playerId].radius -= projectileSettings.damage;
+            players[projectile.ownerId].radius += projectileSettings.damage;
 
-          io.emit("playerHit", players);
+            updateMovementSpeeds({ damping: 2 });
+
+            io.emit("playerHit", players);
+          }
         }
       }
     }
@@ -177,6 +184,24 @@ setInterval(() => {
   io.emit("updateProjectiles", projectiles);
   io.emit("updatePlayerPositions", players);
 }, gameSettings.serverTickRate);
+
+// inverses speed based on radius
+const updateMovementSpeeds = ({ damping = 0 }) => {
+  for (let playerId in players) {
+    const radius = players[playerId].radius;
+
+    const inverseRadius =
+      (playerSettings.radius.maximum + playerSettings.radius.minimum - radius) /
+      damping;
+
+    if (
+      inverseRadius >= playerSettings.speed.minimum &&
+      inverseRadius <= playerSettings.speed.maximum
+    ) {
+      players[playerId].movementSpeed = inverseRadius;
+    }
+  }
+};
 
 server.listen(port, () => {
   console.log(`App listening to port ${port}`);

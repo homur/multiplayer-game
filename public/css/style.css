@@ -19,4 +19,38 @@ canvas {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+}
+
+#gameOverUi {
+  display: none;
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+}
+
+.debugPanel {
+  position: fixed;
+  background-color: #fff;
+  min-height: 200px;
+  width: 200px;
+  top: 100px;
+  left: 5px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.playerInfo > div {
+  border-bottom: 1px solid #000;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
 }
