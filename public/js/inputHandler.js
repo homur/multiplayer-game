@@ -158,6 +158,8 @@ gameHandler.isGameRunning().then(() => {
       x: currentPlayer.x,
       y: currentPlayer.y,
     });
+
+    console.log(playerHandler.getPlayers());
   });
 });
 

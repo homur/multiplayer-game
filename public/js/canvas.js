@@ -19,6 +19,7 @@ function animate() {
   const playerList = playerHandler.getPlayers();
   for (let playerId in playerList) {
     const player = playerList[playerId];
+    //console.log(player.playerName)
     player.draw();
   }
 

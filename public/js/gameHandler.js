@@ -20,8 +20,8 @@ class GameHandler {
 
   initSocket(playerName) {
     socket = io("ws://localhost:3000", { query: { token: "asd", playerName } });
-    socket.on("gameStart", ({ settings, players }) => {
-      gameHandler.startGame(settings);
+    socket.on("gameStart", ({ gameSettings, players }) => {
+      gameHandler.startGame(gameSettings);
       playerHandler.updatePlayerCount(players);
     });
   }
