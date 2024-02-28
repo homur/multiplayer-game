@@ -13,13 +13,31 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
+const mapSettings = {
+  tileRows: 32,
+  tileColumns: 32,
+  tileWidth: 100,
+  tileHeight: 75,
+};
+
+const gameMap = Array.from({ length: mapSettings.tileRows }, () =>
+  Array.from({ length: mapSettings.tileColumns }, () =>
+    Math.floor(Math.random() * 2)
+  )
+);
+
 const players = {};
 
 const gameSettings = {
-  canvasWidth: 800,
-  canvasHeight: 600,
+  viewPortWidth: 800,
+  viewPortHeight: 600,
   serverTickRate: 15,
   maxPlayers: 2,
+  map: {
+    data: gameMap,
+    width: mapSettings.tileColumns * mapSettings.tileWidth,
+    height: mapSettings.tileRows * mapSettings.tileHeight,
+  },
 };
 
 const playerSettings = {
@@ -55,8 +73,8 @@ io.on("connection", (socket) => {
   console.log("a user connected", "token:", token, "playerName:", playerName);
 
   players[socket.id] = {
-    x: 300 * Math.random(),
-    y: 300 * Math.random(),
+    x: gameSettings.map.width * Math.random(),
+    y: gameSettings.map.height * Math.random(),
     color: `hsl(${Math.random() * 360}, 50%, 50%)`,
     radius: playerSettings.radius.default,
     movementSpeed: playerSettings.speed.default,
