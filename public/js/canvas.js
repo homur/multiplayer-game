@@ -8,6 +8,8 @@ gameHandler.isGameRunning().then(() => {
   animate();
 });
 
+console.log(gameHandler);
+
 function animate() {
   animationId = requestAnimationFrame(animate);
 

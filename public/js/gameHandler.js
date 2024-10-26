@@ -16,6 +16,7 @@ class GameHandler {
     document.getElementById("gameStartUi").style.display = "none";
     this.settings = settings;
     this.state = GameState.running;
+    camera.map = settings.map;
   }
 
   initSocket(playerName) {

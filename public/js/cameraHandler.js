@@ -1,30 +1,36 @@
 class Camera {
   constructor() {
-    // Initialize camera properties
-    this.cameraX;
-    this.cameraY;
+    this.cameraOffsetX = 0;
+    this.cameraOffsetY = 0;
+    this.width = 0;
+    this.height = 0;
   }
 
   drawMap() {
-    c.fillStyle = "rgba(0, 0, 0, 1)";
-    c.clearRect(0, 0, canvas.width, canvas.height);
-    c.fillRect(0, 0, canvas.width, canvas.height);
-    // Logic to render a specific part of the map
-    // Use this.cameraX and this.cameraY to determine the visible area
+    if (!this.map) return;
+
+    c.clearRect(0, 0, this.width, this.height);
+    c.save();
+    c.translate(-this.cameraOffsetX, -this.cameraOffsetY);
+    c.fillStyle = "gray";
+    c.fillRect(
+      playerHandler.currentPlayer.x,
+      playerHandler.currentPlayer.y,
+      this.width,
+      this.height
+    );
+    c.restore();
   }
 
   moveMapToPosition({ x, y }) {
-    console.log("moveMapToPosition", x, y);
-    // Logic to move the map based on user movement
-    // Update this.cameraX and this.cameraY accordingly
+    this.cameraOffsetX = x - this.width / 2;
+    this.cameraOffsetY = y - this.height / 2;
   }
 }
 
-const camera = new Camera();
+let camera = new Camera();
 
 gameHandler.isGameRunning().then(() => {
-  camera.moveMapToPosition({
-    x: playerHandler.currentPlayer().x,
-    y: playerHandler.currentPlayer().y,
-  });
+  camera.width = gameHandler.settings.viewPortWidth;
+  camera.height = gameHandler.settings.viewPortHeight;
 });

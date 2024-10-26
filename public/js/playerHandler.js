@@ -54,6 +54,7 @@ class PlayerHandler {
     currentPlayer.x = backendPlayer.x;
     currentPlayer.y = backendPlayer.y;
     currentPlayer.sequenceNumber = backendPlayer.sequenceNumber;
+    camera.moveMapToPosition({ x: currentPlayer.x, y: currentPlayer.y });
   }
 
   updateOtherPlayersPositions(backendPlayers) {
@@ -136,10 +137,12 @@ class PlayerHandler {
 let playerHandler = new PlayerHandler();
 
 gameHandler.isGameRunning().then(() => {
-  socket.on("updatePlayers", (players) => {
+  // called on init
+  socket.on("updatePlayerCount", (players) => {
     playerHandler.updatePlayerCount(players);
   });
 
+  // called on every server tick
   socket.on("updatePlayerPositions", (players) => {
     playerHandler.updatePlayerPositions(players);
     playerHandler.updateDebugUi();

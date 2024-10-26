@@ -42,6 +42,7 @@ gameHandler.isGameRunning().then(() => {
         inputSequenceNumber,
       });
       currentPlayer.y -= currentPlayer.movementSpeed;
+      //camera.moveMapToPosition({ x: currentPlayer.x, y: currentPlayer.y });
     }
     if (keys.a.pressed) {
       inputSequenceNumber++;
@@ -55,6 +56,7 @@ gameHandler.isGameRunning().then(() => {
         inputSequenceNumber,
       });
       currentPlayer.x -= currentPlayer.movementSpeed;
+      //camera.moveMapToPosition({ x: currentPlayer.x, y: currentPlayer.y });
     }
     if (keys.s.pressed) {
       inputSequenceNumber++;
@@ -68,6 +70,7 @@ gameHandler.isGameRunning().then(() => {
         inputSequenceNumber,
       });
       currentPlayer.y += currentPlayer.movementSpeed;
+      //camera.moveMapToPosition({ x: currentPlayer.x, y: currentPlayer.y });
     }
     if (keys.d.pressed) {
       inputSequenceNumber++;
@@ -81,6 +84,7 @@ gameHandler.isGameRunning().then(() => {
         inputSequenceNumber,
       });
       currentPlayer.x += currentPlayer.movementSpeed;
+      //camera.moveMapToPosition({ x: currentPlayer.x, y: currentPlayer.y });
     }
   }, serverTickRate);
 

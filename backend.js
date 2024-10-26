@@ -13,18 +13,11 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-const mapSettings = {
-  tileRows: 32,
-  tileColumns: 32,
-  tileWidth: 100,
-  tileHeight: 75,
-};
-
-const gameMap = Array.from({ length: mapSettings.tileRows }, () =>
+/* const gameMap = Array.from({ length: mapSettings.tileRows }, () =>
   Array.from({ length: mapSettings.tileColumns }, () =>
     Math.floor(Math.random() * 2)
   )
-);
+); */
 
 const players = {};
 
@@ -34,11 +27,12 @@ const gameSettings = {
   serverTickRate: 15,
   maxPlayers: 2,
   map: {
-    data: gameMap,
-    width: mapSettings.tileColumns * mapSettings.tileWidth,
-    height: mapSettings.tileRows * mapSettings.tileHeight,
+    width: 3200,
+    height: 2400,
   },
 };
+
+console.log(gameSettings.map.width, gameSettings.map.height);
 
 const playerSettings = {
   radius: {
@@ -86,7 +80,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", (reason) => {
     delete players[socket.id];
-    io.emit("updatePlayers", players);
+    io.emit("updatePlayerCount", players);
     console.log("a user disconnected", reason);
   });
 
@@ -96,8 +90,8 @@ io.on("connection", (socket) => {
 
     switch (data.key) {
       case "KeyS":
-        if (player.y - player.radius >= gameSettings.canvasHeight) {
-          player.y = gameSettings.canvasHeight - player.radius;
+        if (player.y - player.radius >= gameSettings.map.height) {
+          player.y = gameSettings.map.height - player.radius;
         } else {
           player.y += player.movementSpeed;
         }
@@ -117,8 +111,8 @@ io.on("connection", (socket) => {
         }
         break;
       case "KeyD":
-        if (player.x + player.radius >= gameSettings.canvasWidth) {
-          player.x = gameSettings.canvasWidth - player.radius;
+        if (player.x + player.radius >= gameSettings.map.width) {
+          player.x = gameSettings.map.width - player.radius;
         } else {
           player.x += player.movementSpeed;
         }
@@ -153,7 +147,7 @@ io.on("connection", (socket) => {
 
 // serverTick
 setInterval(() => {
-  // update projectile positions
+  // projectile movement
   for (let projectileId in projectiles) {
     const projectile = projectiles[projectileId];
     projectile.x += projectile.velocity.x;
@@ -164,7 +158,7 @@ setInterval(() => {
       projectile.x - projectileSettings.radius < 0 ||
       projectile.x + projectileSettings.radius > gameSettings.canvasWidth ||
       projectile.y - projectileSettings.radius < 0 ||
-      projectile.y + projectileSettings.radius > gameSettings.canvasHeight
+      projectile.y + projectileSettings.radius > gameSettings.map.height
     ) {
       delete projectiles[projectileId];
     }
